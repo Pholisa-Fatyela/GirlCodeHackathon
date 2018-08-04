@@ -1,0 +1,24 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif
+}
+
+.hidden {
+    display: none;
+}
+
+.messages {
+    background-color: grey;
+    width: 10em;
+    height: 20em;
+}
+
+input[type=text] {
+    margin: 1em;
+    padding: 1em;
+}
+
+input[type=button] {
+    
+    margin: 1em;
+    padding: 1em;
+}
