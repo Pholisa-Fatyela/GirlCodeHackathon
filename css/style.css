@@ -1076,3 +1076,10 @@ Media queries
 		margin-bottom: 30px;
 	}
 }
+
+.comButton {
+	border-radius: 4px;
+	padding: 8px;
+	border-style: groove;
+	float: right;
+}
