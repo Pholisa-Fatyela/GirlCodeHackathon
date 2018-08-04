@@ -1,51 +1,89 @@
-const express = require("express");
+const express = require('express');
 const app = express();
 const exphbs = require('express-handlebars');
 const bodyParser = require('body-parser');
-
-let filter = require('./public/filter');
-let filterInst = filter();
-
-let PORT = process.env.PORT || 3300;
-
-app.engine('handlebars', exphbs({
-  defaultLayout: 'main'
-}));
-
-app.listen(PORT, function() {
-  console.log('App starting on port', PORT);
-});
-
-app.set('view engine', 'handlebars');
-
-app.use(bodyParser.urlencoded({
-  extended: false
-}));
-
-app.use(bodyParser.json());
+const server = require('http').Server(app);
+const io = require('socket.io')(server);
+const ChatManager = require('./chat-manager');
 
 app.use(express.static('public'));
 
-app.get('/', function(req, res) {
-  res.render('home');
+const chats = ChatManager();
+let dashboardSocketId;
+
+io.on('connection', function (client) {
+    function sendTo (socketId, msg) {
+        // record the chat message 
+        chats.logMessage(socketId, msg);
+        // send the message back to the user
+        io.to(socketId).emit('msg', msg);
+        // send the message to the dashboard
+        io.to(dashboardSocketId).emit('msg', {
+            username: chats.getUserName(socketId),
+            message: msg
+        });
+    }
+
+    client.on('chat', function (msg) {
+        sendTo(client.id, msg);
+    });
+
+    // when the dashboard user chat to a user
+    client.on('chat-to', function (chatMessage) {
+        let username = chatMessage.username;
+        let message = chatMessage.message;
+        let socketId = chats.getSocketId(username);
+
+        sendTo(socketId, message);
+    });
+
+    // send a chat history list to a user
+    client.on('get-chat-log', function (chatMessage) {
+        let username = chatMessage.username;
+        let chatLog = chats.chatLogForUserName(username);
+        io.to(client.id).emit('chat-log', chatLog);
+    });
+
+    // a new chat user login
+    client.on('login', function (userData) {
+        chats.login(client.id, userData);
+        // get a chat log for the user who is loggin in
+        let chatLog = chats.chatLog(client.id);
+        // send the chat log to the user that is logging in
+        io.to(client.id).emit('login-response', chatLog);
+        // tell the dashboard there is a new user
+        io.to(dashboardSocketId).emit('new-user', userData.username);
+        // send a default message when a user login
+        let msg = 'Admin: Hi, ' + userData.username + '! How can we help?';
+        // send a message to a client
+        sendTo(client.id, msg);
+    });
+
+    // capture the socketId of the dashboard screen
+    client.on('dashboard', function () {
+        dashboardSocketId = client.id;
+    });
 });
 
-app.get('/dashboard', function(req, res){
-  res.render('dashboard');
+app.engine('handlebars', exphbs({ defaultLayout: 'main' }));
+app.set('view engine', 'handlebars');
+
+app.use(express.static('public'));
+
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }));
+
+// parse application/json
+app.use(bodyParser.json());
+
+app.get('/', function (req, res) {
+    res.render('chat');
 });
 
-app.get('/moments', function(req, res){
-  res.render('moments');
+app.get('/dashboard', function (req, res) {
+    res.render('dashboard', { users: chats.chatList() });
 });
 
-app.post('/moments', function(req, res){
-  res.render('moments', filterInst(req.body.filterMoments));
-});
-
-app.get('/community', function(req, res){
-  res.render('community');
-});
-
-app.get('/one-on-one', function(req, res){
-  res.render('one-on-one');
+server.listen(3300, function () {
+    console.log('started on: ', this.address().port);
 });

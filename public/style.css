@@ -1,0 +1,41 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif
+}
+
+.hidden {
+    display: none;
+}
+
+.messages {
+    /* background-color: grey; */
+    /* width: 10em; */
+    /* height: 20em; */
+    list-style: none;
+}
+
+input[type=text] {
+    margin: 1em;
+    padding: 1em;
+}
+
+input[type=button] {
+
+    margin: 1em;
+    padding: 1em;
+}
+
+
+/* Chat containers */
+.container {
+    border: 2px solid #dedede;
+    background-color: #f1f1f1;
+    border-radius: 5px;
+    padding: 10px;
+    margin: 10px 0;
+}
+
+/* Darker chat container */
+.darker {
+    border-color: #ccc;
+    background-color: #ddd;
+}
