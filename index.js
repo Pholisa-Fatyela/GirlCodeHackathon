@@ -9,11 +9,16 @@ const ChatManager = require('./chat-manager');
 app.use(express.static('public'));
 
 const chats = ChatManager();
+let dashboardSocketId;
 
 io.on('connection', function (client) {
     function sendTo (socketId, msg) {
         chats.logMessage(socketId, msg);
         io.to(socketId).emit('msg', msg);
+        io.to(dashboardSocketId).emit('msg', {
+            username: chats.getUserName(socketId),
+            message: msg
+        });
     }
 
     client.on('chat', function (msg) {
@@ -36,8 +41,18 @@ io.on('connection', function (client) {
 
     client.on('login', function (userData) {
         chats.login(client.id, userData);
+        let chatLog = chats.chatLog(client.id);
+
+        io.to(client.id).emit('login-response', chatLog);
+
         let msg = 'Hi, ' + userData.username + '! How can we help?';
         sendTo(client.id, msg);
+    });
+
+    
+
+    client.on('dashboard', function () {
+        dashboardSocketId = client.id;
     });
 });
 

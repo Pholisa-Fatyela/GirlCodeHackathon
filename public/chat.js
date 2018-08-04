@@ -13,6 +13,14 @@ socket.on('msg', function (msg) {
     messages.innerHTML += '<li>' + msg + '</li>';
 });
 
+socket.on('login-response', function (chatLog) {
+    messages.innerHTML = '';
+    let logList = chatLog.map(function (chat) {
+        return '<li>' + chat + '</li>';
+    });
+    messages.innerHTML = logList;
+});
+
 function login (data) {
     socket.emit('login', data);
 }

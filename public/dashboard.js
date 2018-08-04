@@ -2,13 +2,25 @@ const socket = io.connect();
 
 let usernameElem = document.querySelector('.username');
 let messages = document.querySelector('.messages');
+let chatBtn = document.querySelector('.chatBtn');
+let chatMessage = document.querySelector('.chatMessage');
+let currentUsername;
 
-socket.on('chat-log', function(chatLog) {
+// login as a dashboard
+socket.emit('dashboard');
+
+socket.on('chat-log', function (chatLog) {
     messages.innerHTML = '';
-    let logList = chatLog.map(function(chat) {
+    let logList = chatLog.map(function (chat) {
         return '<li>' + chat + '</li>';
     });
     messages.innerHTML = logList;
+});
+
+socket.on('msg', function (msg) {
+    if (msg.username === currentUsername) {
+        messages.innerHTML += '<li>' + msg.message + '</li>';
+    }
 });
 
 socket.on('new-user', function (userdata) {
@@ -16,9 +28,18 @@ socket.on('new-user', function (userdata) {
 });
 
 function chatWith (username) {
+    currentUsername = username;
     usernameElem.innerHTML = username;
-
     socket.emit('get-chat-log', {
         username
     });
 }
+
+chatBtn.addEventListener('click', function () {
+    let message = 'Admin: ' + chatMessage.value;
+
+    socket.emit('chat-to', {
+        username: currentUsername,
+        message
+    });
+});
