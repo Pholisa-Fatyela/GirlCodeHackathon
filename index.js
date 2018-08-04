@@ -13,8 +13,11 @@ let dashboardSocketId;
 
 io.on('connection', function (client) {
     function sendTo (socketId, msg) {
+        // record the chat message 
         chats.logMessage(socketId, msg);
+        // send the message back to the user
         io.to(socketId).emit('msg', msg);
+        // send the message to the dashboard
         io.to(dashboardSocketId).emit('msg', {
             username: chats.getUserName(socketId),
             message: msg
@@ -45,11 +48,11 @@ io.on('connection', function (client) {
 
         io.to(client.id).emit('login-response', chatLog);
 
+        io.to(dashboardSocketId).emit('new-user', userData.username);
+        
         let msg = 'Hi, ' + userData.username + '! How can we help?';
         sendTo(client.id, msg);
     });
-
-    
 
     client.on('dashboard', function () {
         dashboardSocketId = client.id;

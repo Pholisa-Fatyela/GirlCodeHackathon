@@ -1,6 +1,7 @@
 const socket = io.connect();
 
 let usernameElem = document.querySelector('.username');
+let usersElem = document.querySelector('.users');
 let messages = document.querySelector('.messages');
 let chatBtn = document.querySelector('.chatBtn');
 let chatMessage = document.querySelector('.chatMessage');
@@ -23,8 +24,8 @@ socket.on('msg', function (msg) {
     }
 });
 
-socket.on('new-user', function (userdata) {
-
+socket.on('new-user', function (username) {
+    usersElem.innerHTML += `<li onclick="chatWith('${username}')">${username}</li>`;
 });
 
 function chatWith (username) {
