@@ -16,7 +16,12 @@ socket.on('msg', function (msg) {
 socket.on('login-response', function (chatLog) {
     messages.innerHTML = '';
     let logList = chatLog.map(function (chat) {
-        return '<li>' + chat + '</li>';
+        if (chat.split(':')[0].trim() === 'Admin') {
+            var className = 'admin';
+        } else {
+            var className = 'client';
+        }
+        return `<li class="${className}">${chat}</li>`;
     });
     messages.innerHTML = logList;
 });
