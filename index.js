@@ -13,7 +13,7 @@ let dashboardSocketId;
 
 io.on('connection', function (client) {
     function sendTo (socketId, msg) {
-        // record the chat message 
+        // record the chat message
         chats.logMessage(socketId, msg);
         // send the message back to the user
         io.to(socketId).emit('msg', msg);
