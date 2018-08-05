@@ -65,7 +65,7 @@ io.on('connection', function (client) {
     });
 });
 
-app.engine('handlebars', exphbs({ defaultLayout: 'main' }));
+app.engine('handlebars', exphbs({defaultLayout: 'main'}));
 app.set('view engine', 'handlebars');
 
 app.use(express.static('public'));
@@ -77,13 +77,45 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 app.get('/', function (req, res) {
-    res.render('chat');
+    res.render('home');
 });
 
 app.get('/dashboard', function (req, res) {
     res.render('dashboard', { users: chats.chatList() });
 });
 
-server.listen(3010, function () {
+app.get('/signin', function (req, res) {
+    res.render('signin');
+});
+
+app.get('/signout', function (req, res) {
+    res.render('home');
+});
+
+app.get('/signUp', function (req, res) {
+    res.render('signUp');
+});
+
+app.get('/infoLink', function (req, res) {
+    res.render('infoLink');
+});
+
+app.get('/moments', function (req, res) {
+    res.render('moments');
+});
+
+app.get('/profile', function (req, res) {
+    res.render('profile');
+});
+
+app.get('/community', function (req, res) {
+    res.render('community');
+});
+
+app.get('/chat', function (req, res) {
+    res.render('chat');
+});
+
+server.listen(3000, function () {
     console.log('started on: ', this.address().port);
 });

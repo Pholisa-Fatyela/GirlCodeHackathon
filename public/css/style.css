@@ -22,7 +22,9 @@ body {
 	color:#777;
 	background: #f7f7f7;
 	line-height: 1.6em;
-
+}
+.quiz{
+	padding: 30px;
 }
 
 .clear {
